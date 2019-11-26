@@ -1,0 +1,28 @@
+{
+  "name": "civ-discord-bot",
+  "version": "1.0.0",
+  "description": "A discord bot that notifies when it's your turn in a play by cloud Civilization game",
+  "main": "index.js",
+  "repository": "https://github.com/ScreamingHawk/civ-discord-bot.git",
+  "author": "Michael Standen",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "start": "node server/server.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "concurrently \"cd client && yarn start\" \"yarn watch\"",
+    "watch": "nodemon server/server.js",
+    "heroku-postbuild": "cd client && yarn && yarn build"
+  },
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "http": "^0.0.0",
+    "socket.io": "^2.3.0",
+    "winston": "^3.2.1"
+  },
+  "devDependencies": {
+    "concurrently": "^5.0.0",
+    "nodemon": "^2.0.1"
+  }
+}
