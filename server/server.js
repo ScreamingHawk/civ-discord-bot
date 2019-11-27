@@ -10,7 +10,7 @@ const app = express()
 const server = http.createServer(app)
 const io = socketio(server)
 
-const configureExample = require('./routes/example')
+const configureGames = require('./routes/games')
 
 const clientFolder = path.join(__dirname, '..', 'client/build')
 
@@ -20,40 +20,12 @@ app.use(bodyParser.json())
 // Serve static files
 app.use(express.static(clientFolder))
 
-let connectedCount = 0
-
 const store = {
-	users: [],
-}
-const common = {
-	countActiveUsers: () => {
-		if (store.users.length > 1){
-			return store.users.reduce((a, u) => a + (u.active ? 1 : 0), 0)
-		} else if (store.users.length == 1){
-			return store.users[0].active ? 1 : 0
-		}
-		return 0
-	}
+	games: [],
 }
 
 io.on('connection', socket => {
-	log.debug("A user connected")
-	connectedCount++
-	log.debug(`There are ${connectedCount} connected users`)
-
-	socket.on('disconnect', () => {
-		log.debug("A user disconnected")
-		connectedCount--
-		log.debug(`There are ${connectedCount} connected users`)
-		// Deactivate user
-		const user = store.users.find(u => u.id === socket.id)
-		if (user){
-			user.active = false
-		}
-		io.emit('users is', store.users)
-	})
-
-	configureExample(io, socket, store)
+	configureGames(io, socket, store)
 })
 
 // Fail over
