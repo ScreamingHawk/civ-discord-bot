@@ -12,6 +12,40 @@ const pool = new Pool({
 	//ssl: true,
 })
 
+init = (store, next) => {
+	createDatabase(err => {
+		if (err){
+			log.error('Unable to init database', err)
+			return next(err)
+		}
+		async.parallel([
+			callback => {
+				loadPlayers((err, players) => {
+					if (err){
+						return callback(err)
+					}
+					store.players = players
+				})
+			},
+			callback => {
+				loadGames((err, games) => {
+					if (err){
+						return callback(err)
+					}
+					store.games = games
+				})
+			},
+		], err => {
+			if (err){
+				log.error('Initialisation completed with errors')
+			} else {
+				log.info('Initialisation completed successfully')
+			}
+			next(err)
+		})
+	})
+}
+
 checkErr = err => {
 	if (err){
 		log.error(err)
@@ -33,11 +67,25 @@ clearDatabase = next => {
 	log.warn("Dropping database tables")
 	pool.connect((err, client, done) => {
 		checkErr(err)
-		client.query('DROP TABLE IF EXISTS players', (err, res) => {
-			checkErr(err)
-			log.info('Dropped players table')
-			callThese(done, next)
-		})
+		async.parallel(
+			[
+				callback => {
+					client.query('DROP TABLE IF EXISTS players', (err, res) => {
+						log.info('Dropped players table')
+						callback(err)
+					})
+				},
+				callback => {
+					client.query('DROP TABLE IF EXISTS games', (err, res) => {
+						log.info('Dropped games table')
+						callback(err)
+					})
+				},
+			], err => {
+				checkErr(err)
+				callThese(done, next)
+			}
+		)
 	})
 }
 
@@ -45,24 +93,60 @@ createDatabase = next => {
 	// Check and upgrade database
 	pool.connect((err, client, done) => {
 		checkErr(err)
-		client.query('SELECT count(table_name) FROM information_schema.tables WHERE table_name = \'players\'', (err, res) => {
-			checkErr(err)
-			if (res.rows[0].count === "0"){
-				// Create missing table
-				log.warn("Creating database tables")
-				client.query('CREATE TABLE players (\
-					id INT PRIMARY KEY,\
-					civName VARCHAR(40),\
-					discordName VARCHAR(40)\
-				);', (err, res)=> {
-					checkErr(err)
-					log.info('Created players table')
-					callThese(done, next)
-				})
-			} else {
+		async.parallel(
+			[
+				callback => {
+					client.query('SELECT count(table_name) FROM information_schema.tables WHERE table_name = \'players\'', (err, res) => {
+						if (err){
+							return callback(err)
+						}
+						if (res.rows[0].count === "0"){
+							// Create missing table
+							log.warn("Creating database table players")
+							client.query('CREATE TABLE players (\
+								id INT PRIMARY KEY,\
+								civName VARCHAR(40),\
+								discordName VARCHAR(40)\
+							);', (err, res)=> {
+								if (err){
+									return callback(err)
+								}
+								log.info('Created players table')
+								callback()
+							})
+						} else {
+							callback()
+						}
+					})
+				},
+				callback => {
+					client.query('SELECT count(table_name) FROM information_schema.tables WHERE table_name = \'games\'', (err, res) => {
+						if (err){
+							return callback(err)
+						}
+						if (res.rows[0].count === "0"){
+							// Create missing table
+							log.warn("Creating database table games")
+							client.query('CREATE TABLE games (\
+								id INT PRIMARY KEY,\
+								name VARCHAR(40)\
+							);', (err, res)=> {
+								if (err){
+									return callback(err)
+								}
+								log.info('Created games table')
+								callback()
+							})
+						} else {
+							callback()
+						}
+					})
+				},
+			], err => {
+				checkErr(err)
 				callThese(done, next)
 			}
-		})
+		)
 	})
 }
 
@@ -98,6 +182,19 @@ loadPlayers = next => {
 			done()
 			next(err, res.rows)
 			log.info(`Loaded ${res.rows.length} players`)
+		})
+	})
+}
+
+loadGames = next => {
+	// Load games
+	pool.connect((err, client, done) => {
+		checkErr(err)
+		client.query('SELECT * FROM games', (err, res) => {
+			checkErr(err)
+			done()
+			next(err, res.rows)
+			log.info(`Loaded ${res.rows.length} games`)
 		})
 	})
 }
@@ -150,6 +247,7 @@ deletePlayer = (playerId, next) => {
 }
 
 module.exports = {
+	init,
 	createDatabase,
 	clearDatabase,
 	savePlayers,

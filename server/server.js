@@ -26,12 +26,9 @@ const store = {
 	players : [],
 }
 // Init data from database
-database.loadPlayers((err, players) => {
+database.init(store, (err) => {
 	if (err){
 		log.error('Unable to load players on init')
-	}
-	if (players){
-		store.players = players
 	}
 })
 
