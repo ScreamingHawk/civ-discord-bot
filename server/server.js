@@ -5,12 +5,13 @@ const http = require('http')
 const socketio = require('socket.io')
 
 const log = require('./util/logger')
+const database = require('./util/database')
 
 const app = express()
 const server = http.createServer(app)
 const io = socketio(server)
 
-const configureGames = require('./routes/games')
+const configureDataRoutes = require('./routes/data')
 
 const clientFolder = path.join(__dirname, '..', 'client/build')
 
@@ -22,10 +23,20 @@ app.use(express.static(clientFolder))
 
 const store = {
 	games: [],
+	players : [],
 }
+// Init data from database
+database.loadPlayers((err, players) => {
+	if (err){
+		log.error('Unable to load players on init')
+	}
+	if (players){
+		store.players = players
+	}
+})
 
 io.on('connection', socket => {
-	configureGames(io, socket, store)
+	configureDataRoutes(io, socket, store)
 })
 
 require('./routes/notify')(app, store)
