@@ -28,6 +28,8 @@ io.on('connection', socket => {
 	configureGames(io, socket, store)
 })
 
+require('./routes/notify')(app, store)
+
 // Fail over
 app.get('*', (req, res)=>{
 	res.sendFile(path.join(clientFolder, 'index.html'))
