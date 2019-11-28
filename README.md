@@ -14,6 +14,18 @@ Install dependencies
 yarn && cd client && yarn
 ```
 
+Create a PostgreSQL database
+
+[Create a discord bot](https://discordjs.guide/preparations/setting-up-a-bot-application.html#creating-your-bot)
+
+For local use, create a `.env` file and populate the following values:
+
+```
+DATABASE_URL=
+DISCORD_TOKEN=
+DISCORD_PREFIX=
+```
+
 ### Start
 
 Single command, this enables *watching*
@@ -29,6 +41,18 @@ Set up heroku
 ```sh
 heroku login
 heroku create
+```
+
+Add a database
+
+```sh
+#TODO
+```
+
+Set up environment variables
+
+```sh
+#TODO
 ```
 
 Do the deployment
