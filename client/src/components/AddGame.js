@@ -31,12 +31,18 @@ const StyledSending = styled.span`
 class AddGame extends Component {
 	state = {
 		loaded: true,
-		newGame: "",
+		name: "",
+		channel: "",
 	}
 
-	updateNewGame = e => {
+	updateName = e => {
 		this.setState({
-			newGame: e.target.value,
+			name: e.target.value,
+		})
+	}
+	updateChannel = e => {
+		this.setState({
+			channel: e.target.value,
 		})
 	}
 
@@ -44,17 +50,21 @@ class AddGame extends Component {
 		if (e){
 			e.preventDefault();
 		}
-		const { newGame } = this.state
-		if (newGame === ""){
+		const { name, channel } = this.state
+		if (name === "" || channel === ""){
 			return
 		}
 		this.setState({
 			loaded: false,
 		}, () => {
-			socket.emit('add game', newGame)
+			socket.emit('add game', {
+				name,
+				channel,
+			})
 			this.setState({
 				loaded: true,
-				newGame: "",
+				name: "",
+				channel: "",
 			})
 		})
 	}
@@ -62,19 +72,24 @@ class AddGame extends Component {
 	render() {
 		const {
 			loaded,
-			newGame,
+			name,
+			channel,
 		} = this.state;
 		return (
 			<StyledAddGame>
 				{loaded ? (
 					<StyledForm onSubmit={this.handleSubmit}>
 						<Input
-							value={newGame}
-							placeholder="Add a game"
-							onChange={this.updateNewGame} />
+							value={name}
+							placeholder="Game's Name"
+							onChange={this.updateName} />
+						<Input
+							value={channel}
+							placeholder="Discord Channel Id"
+							onChange={this.updateChannel} />
 						<Button
 								type="submit">
-							Submit
+							Add Game
 						</Button>
 					</StyledForm>
 				) : (

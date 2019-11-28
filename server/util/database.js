@@ -129,7 +129,8 @@ createDatabase = next => {
 							log.warn("Creating database table games")
 							client.query('CREATE TABLE games (\
 								id INT PRIMARY KEY,\
-								name VARCHAR(40)\
+								name VARCHAR(40),\
+								channel VARCHAR(20)\
 							);', (err, res)=> {
 								if (err){
 									return callback(err)
@@ -216,19 +217,19 @@ addPlayer = (player, next) => {
 	})
 }
 
-addGame = (gameName, next) => {
+addGame = (game, next) => {
 	// Add game
 	log.debug("Saving game: ")
 	pool.connect((err, client, done) => {
 		checkErr(err)
 		client.query({
-			text: 'INSERT INTO games (id, name)\
-				SELECT COALESCE(MAX(id), 0)+1, $1 from games',
-			values: [gameName]
+			text: 'INSERT INTO games (id, name, channel)\
+				SELECT COALESCE(MAX(id), 0)+1, $1, $2 from games',
+			values: [game.name, game.channel]
 		}, err => {
 			checkErr(err)
 			callThese(done, next)
-			log.info(`Saved game ${gameName}`)
+			log.info(`Saved game ${game.name}`)
 		})
 	})
 }

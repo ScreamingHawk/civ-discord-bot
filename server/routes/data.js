@@ -4,9 +4,9 @@ const database = require('../util/database')
 module.exports = (io, socket, store) => {
 	socket.emit('games are', store.games)
 	socket.emit('players are', store.players)
-	socket.on('add game', newGame => {
-		log.info(`Adding game ${newGame}`)
-		database.addGame(newGame, (err) => {
+	socket.on('add game', game => {
+		log.info(`Adding game ${game}`)
+		database.addGame(game, (err) => {
 			if (err){
 				log.error('Unable to add game')
 				return

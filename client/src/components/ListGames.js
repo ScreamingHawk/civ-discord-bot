@@ -11,9 +11,25 @@ const Wrapper = styled.div`
 	flex-direction: column;
 `
 
-const StyledGame = styled.span`
+const StyledTable = styled.table`
 	width: 100%;
-	text-align: center;
+	max-width: 920px;
+	margin: 0 auto 20px;
+	table-layout: fixed;
+	border-spacing: 0;
+	border-collapse: collapse;
+	td, th {
+		padding: 4px;
+	}
+	th {
+		text-align: left;
+		border-bottom: 1px solid lightgrey;
+	}
+	th:first-child,
+	td:first-child {
+		text-align: right;
+		border-right: 1px solid lightgrey;
+	}
 `
 
 const StyledNoGames = styled.span`
@@ -38,18 +54,30 @@ const ListGames = () => {
 		}
 	})
 
+	if (games.length === 0){
+		return (
+			<Wrapper>
+				<H2>Games List</H2>
+				<StyledNoGames>No games...</StyledNoGames>
+			</Wrapper>
+		)
+	}
+
 	return (
 		<Wrapper>
 			<H2>Games List</H2>
-			{games.length > 0 ?
-				games.map((game, i) => (
-					<StyledGame key={i}>
-						{game.name}
-					</StyledGame>
-				))
-			 : (
-				<StyledNoGames>No games...</StyledNoGames>
-			 )}
+			<StyledTable>
+				<tr>
+					<th>Name</th>
+					<th>Discord Channel Id</th>
+				</tr>
+				{games.map((game, i) => (
+					<tr key={i}>
+						<td>{game.name}</td>
+						<td>{game.channel}</td>
+					</tr>
+				))}
+			</StyledTable>
 		</Wrapper>
 	)
 
