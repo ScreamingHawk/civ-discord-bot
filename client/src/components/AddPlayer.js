@@ -31,18 +31,18 @@ const StyledSending = styled.span`
 class AddPlayer extends Component {
 	state = {
 		loaded: true,
-		civName: "",
-		discordName: "",
+		civname: "",
+		discordname: "",
 	}
 
-	updateCivName = e => {
+	updateCivname = e => {
 		this.setState({
-			civName: e.target.value,
+			civname: e.target.value,
 		})
 	}
-	updateDiscordName = e => {
+	updateDiscordname = e => {
 		this.setState({
-			discordName: e.target.value,
+			discordname: e.target.value,
 		})
 	}
 
@@ -50,21 +50,21 @@ class AddPlayer extends Component {
 		if (e){
 			e.preventDefault();
 		}
-		const { civName, discordName } = this.state
-		if (civName === "" || discordName === ""){
+		const { civname, discordname } = this.state
+		if (civname === "" || discordname === ""){
 			return
 		}
 		this.setState({
 			loaded: false,
 		}, () => {
 			socket.emit('add player', {
-				civName,
-				discordName,
+				civname,
+				discordname,
 			})
 			this.setState({
 				loaded: true,
-				civName: "",
-				discordName: "",
+				civname: "",
+				discordname: "",
 			})
 		})
 	}
@@ -72,21 +72,21 @@ class AddPlayer extends Component {
 	render() {
 		const {
 			loaded,
-			civName,
-			discordName,
+			civname,
+			discordname,
 		} = this.state;
 		return (
 			<StyledAddPlayer>
 				{loaded ? (
 					<StyledForm onSubmit={this.handleSubmit}>
 						<Input
-							value={civName}
+							value={civname}
 							placeholder="Player's Civ Name"
-							onChange={this.updateCivName} />
+							onChange={this.updateCivname} />
 						<Input
-							value={discordName}
+							value={discordname}
 							placeholder="Player's Discord Name"
-							onChange={this.updateDiscordName} />
+							onChange={this.updateDiscordname} />
 						<Button
 								type="submit">
 							Add Player

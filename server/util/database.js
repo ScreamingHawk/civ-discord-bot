@@ -105,8 +105,8 @@ createDatabase = next => {
 							log.warn("Creating database table players")
 							client.query('CREATE TABLE players (\
 								id INT PRIMARY KEY,\
-								civName VARCHAR(40),\
-								discordName VARCHAR(40)\
+								civname VARCHAR(40),\
+								discordname VARCHAR(40)\
 							);', (err, res)=> {
 								if (err){
 									return callback(err)
@@ -157,11 +157,11 @@ savePlayers = (players, next) => {
 		checkErr(err)
 		async.forEach(players, (player, callback)=>{
 			client.query({
-				text: 'INSERT INTO players (id, civName, discordName)\
+				text: 'INSERT INTO players (id, civname, discordname)\
 					VALUES ($1, $2, $3)\
 					ON CONFLICT (id) DO UPDATE\
-						SET civName = $2, discordName = $3',
-				values: [player.id, player.civName, player.discordName]
+						SET civname = $2, discordname = $3',
+				values: [player.id, player.civname, player.discordname]
 			}, err => {
 				callback(err)
 			})
@@ -205,13 +205,30 @@ addPlayer = (player, next) => {
 	pool.connect((err, client, done) => {
 		checkErr(err)
 		client.query({
-			text: 'INSERT INTO players (id, civName, discordName)\
+			text: 'INSERT INTO players (id, civname, discordname)\
 				SELECT COALESCE(MAX(id), 0)+1, $1, $2 from Players',
-			values: [player.civName, player.discordName]
+			values: [player.civname, player.discordname]
 		}, err => {
 			checkErr(err)
 			callThese(done, next)
-			log.info(`Saved player ${player.civName}:${player.discordName}`)
+			log.info(`Saved player ${player.civname}:${player.discordname}`)
+		})
+	})
+}
+
+addGame = (gameName, next) => {
+	// Add game
+	log.debug("Saving game: ")
+	pool.connect((err, client, done) => {
+		checkErr(err)
+		client.query({
+			text: 'INSERT INTO games (id, name)\
+				SELECT COALESCE(MAX(id), 0)+1, $1 from games',
+			values: [gameName]
+		}, err => {
+			checkErr(err)
+			callThese(done, next)
+			log.info(`Saved game ${gameName}`)
 		})
 	})
 }
@@ -252,7 +269,9 @@ module.exports = {
 	clearDatabase,
 	savePlayers,
 	loadPlayers,
+	loadGames,
 	addPlayer,
+	addGame,
 	getNextPlayerId,
 	deletePlayer,
 }
