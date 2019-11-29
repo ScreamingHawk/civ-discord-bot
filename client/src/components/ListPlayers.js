@@ -74,7 +74,7 @@ const ListPlayers = () => {
 				{players.map((player, i) => (
 					<tr key={i}>
 						<td>{player.civname}</td>
-						<td>{player.discordname}</td>
+						<td>{player.discordid}</td>
 					</tr>
 				))}
 			</StyledTable>

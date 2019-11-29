@@ -25,7 +25,7 @@ module.exports = (io, socket, store) => {
 		})
 	})
 	socket.on('add player', player => {
-		if (!player.civname || !player.discordname){
+		if (!player.civname || !player.discordid){
 			log.error(`Unable to add incomplete player ${JSON.stringify(player)}`)
 			return
 		}

@@ -106,7 +106,7 @@ createDatabase = next => {
 							client.query('CREATE TABLE players (\
 								id INT PRIMARY KEY,\
 								civname VARCHAR(40),\
-								discordname VARCHAR(40)\
+								discordid VARCHAR(40)\
 							);', (err, res)=> {
 								if (err){
 									return callback(err)
@@ -158,11 +158,11 @@ savePlayers = (players, next) => {
 		checkErr(err)
 		async.forEach(players, (player, callback)=>{
 			client.query({
-				text: 'INSERT INTO players (id, civname, discordname)\
+				text: 'INSERT INTO players (id, civname, discordid)\
 					VALUES ($1, $2, $3)\
 					ON CONFLICT (id) DO UPDATE\
-						SET civname = $2, discordname = $3',
-				values: [player.id, player.civname, player.discordname]
+						SET civname = $2, discordid = $3',
+				values: [player.id, player.civname, player.discordid]
 			}, err => {
 				callback(err)
 			})
@@ -206,13 +206,13 @@ addPlayer = (player, next) => {
 	pool.connect((err, client, done) => {
 		checkErr(err)
 		client.query({
-			text: 'INSERT INTO players (id, civname, discordname)\
+			text: 'INSERT INTO players (id, civname, discordid)\
 				SELECT COALESCE(MAX(id), 0)+1, $1, $2 from Players',
-			values: [player.civname, player.discordname]
+			values: [player.civname, player.discordid]
 		}, err => {
 			checkErr(err)
 			callThese(done, next)
-			log.info(`Saved player ${player.civname}:${player.discordname}`)
+			log.info(`Saved player ${player.civname}:${player.discordid}`)
 		})
 	})
 }

@@ -32,7 +32,7 @@ class AddPlayer extends Component {
 	state = {
 		loaded: true,
 		civname: "",
-		discordname: "",
+		discordid: "",
 	}
 
 	updateCivname = e => {
@@ -42,7 +42,7 @@ class AddPlayer extends Component {
 	}
 	updateDiscordname = e => {
 		this.setState({
-			discordname: e.target.value,
+			discordid: e.target.value,
 		})
 	}
 
@@ -50,8 +50,8 @@ class AddPlayer extends Component {
 		if (e){
 			e.preventDefault();
 		}
-		const { civname, discordname } = this.state
-		if (civname === "" || discordname === ""){
+		const { civname, discordid } = this.state
+		if (civname === "" || discordid === ""){
 			return
 		}
 		this.setState({
@@ -59,12 +59,12 @@ class AddPlayer extends Component {
 		}, () => {
 			socket.emit('add player', {
 				civname,
-				discordname,
+				discordid,
 			})
 			this.setState({
 				loaded: true,
 				civname: "",
-				discordname: "",
+				discordid: "",
 			})
 		})
 	}
@@ -73,7 +73,7 @@ class AddPlayer extends Component {
 		const {
 			loaded,
 			civname,
-			discordname,
+			discordid,
 		} = this.state;
 		return (
 			<StyledAddPlayer>
@@ -84,8 +84,8 @@ class AddPlayer extends Component {
 							placeholder="Player's Civ Name"
 							onChange={this.updateCivname} />
 						<Input
-							value={discordname}
-							placeholder="Player's Discord Name"
+							value={discordid}
+							placeholder="Player's Discord Id"
 							onChange={this.updateDiscordname} />
 						<Button
 								type="submit">
