@@ -36,23 +36,19 @@ yarn dev
 
 ### Deploy
 
-Set up heroku
+Set up heroku and database
 
 ```sh
 heroku login
 heroku create
-```
-
-Add a database
-
-```sh
-#TODO
+heroku addons:create heroku-postgresql:hobby-dev
 ```
 
 Set up environment variables
 
 ```sh
-#TODO
+heroku config:set DISCORD_TOKEN=XXX
+heroku config:set DISCORD_PREFIX='Milk '
 ```
 
 Do the deployment
